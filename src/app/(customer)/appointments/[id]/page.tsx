@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageHeader, Separator } from "@/components/ui/misc";
 import { ACTIVE_APPOINTMENT_STATUSES } from "@/config/constants";
+import { CANCELLABLE_APPOINTMENT_STATUSES, getCancellationPolicy } from "@/lib/cancellation";
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { getBookingDays } from "@/services/availability";
@@ -32,6 +33,18 @@ export default async function AppointmentDetailPage({
   const zonedEnd = toZonedTime(new Date(appointment.end_at), appointment.timezone);
   const days = getBookingDays(appointment.timezone, Number(appointment.organization?.settings?.booking_horizon_days ?? 3));
   const canManage = ACTIVE_APPOINTMENT_STATUSES.includes(appointment.status);
+  const canReschedule = (CANCELLABLE_APPOINTMENT_STATUSES as readonly string[]).includes(
+    appointment.status,
+  );
+  const cancellation = getCancellationPolicy(appointment, appointment.service);
+
+  const manageDescription = !canManage
+    ? "This appointment is no longer active and cannot be changed."
+    : cancellation.canCancel
+      ? "Need to change your plans? You can reschedule or cancel below."
+      : canReschedule
+        ? "Need a different time? You can reschedule this visit below. Online cancellation is not available."
+        : "This visit is already in progress and can no longer be changed online.";
 
   return (
     <div className="space-y-7">
@@ -97,12 +110,18 @@ export default async function AppointmentDetailPage({
           <Card className="p-5">
             <h2 className="text-sm font-bold">Manage</h2>
             <p className="mt-1.5 text-xs leading-relaxed text-muted">
-              {canManage
-                ? "Need to change your plans? You can reschedule or cancel below."
-                : "This appointment is no longer active and cannot be changed."}
+              {manageDescription}
             </p>
             {canManage ? (
-              <div className="mt-5"><AppointmentActions appointment={appointment} days={days} /></div>
+              <div className="mt-5">
+                <AppointmentActions
+                  appointment={appointment}
+                  days={days}
+                  canReschedule={canReschedule}
+                  canCancel={cancellation.canCancel}
+                  cancelMessage={cancellation.message}
+                />
+              </div>
             ) : (
               <Badge tone="neutral" className="mt-4">Final state</Badge>
             )}

@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
+import type { AppointmentStatus } from "@/config/constants";
 import { getCancellationPolicy } from "./cancellation";
 
 const startAt = "2026-03-10T15:00:00.000Z";
 
-function appointment(status = "BOOKED") {
+function appointment(status: AppointmentStatus = "BOOKED") {
   return { status, start_at: startAt } as const;
 }
 
@@ -59,7 +60,7 @@ describe("getCancellationPolicy", () => {
   });
 
   it("blocks cancellation for statuses that are not cancellable", () => {
-    for (const status of ["IN_PROGRESS", "COMPLETED", "CANCELLED", "EXPIRED", "NO_SHOW"]) {
+    for (const status of ["IN_PROGRESS", "COMPLETED", "CANCELLED", "EXPIRED", "NO_SHOW"] as const) {
       const policy = getCancellationPolicy(
         appointment(status),
         { allow_cancellation: true, cancellation_hours: 0 },
