@@ -195,7 +195,7 @@ body::before {
 @layer base {
   :root {
     --radius: 0.75rem;
-    -- card: var(--surface);
+    --card: var(--surface);
   }
 }
 

@@ -22,6 +22,16 @@ const schema = z.object({
 type Values = z.infer<typeof schema>;
 
 export default function LoginPage() {
+  return (
+    <React.Suspense
+      fallback={<div className="h-[420px] animate-pulse rounded-3xl border border-white/[0.08] bg-white/[0.02]" />}
+    >
+      <LoginContent />
+    </React.Suspense>
+  );
+}
+
+function LoginContent() {
   const router = useRouter();
   const params = useSearchParams();
   const [show, setShow] = React.useState(false);

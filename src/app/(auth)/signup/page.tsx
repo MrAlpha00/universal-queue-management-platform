@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Building2, Check, LockKeyhole, Mail, UserRound } from "lucide-react";
 import { toast } from "sonner";
@@ -26,14 +26,13 @@ type Values = z.infer<typeof schema>;
 
 export default function SignupPage() {
   const router = useRouter();
-  const [ready, setReady] = React.useState(false);
-  React.useEffect(() => setReady(hasSupabaseConfig()), []);
+  const [ready] = React.useState(() => hasSupabaseConfig());
 
   const form = useForm<Values>({
     resolver: zodResolver(schema),
     defaultValues: { fullName: "", email: "", password: "", accountType: "customer" },
   });
-  const accountType = form.watch("accountType");
+  const accountType = useWatch({ control: form.control, name: "accountType" });
 
   async function onSubmit(values: Values) {
     if (!ready) {
