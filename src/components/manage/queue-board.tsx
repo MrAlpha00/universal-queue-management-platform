@@ -3,7 +3,6 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Loader2, PlayCircle, UserCheck, UserX } from "lucide-react";
-import { StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";

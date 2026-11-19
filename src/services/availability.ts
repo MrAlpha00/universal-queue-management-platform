@@ -4,7 +4,7 @@ import { DEFAULT_BOOKING_HORIZON_DAYS } from "@/config/constants";
 import { errors } from "@/lib/errors";
 import { createClient } from "@/lib/supabase/server";
 import { getOrganizationBySlug, getOrganizationBranches, getOrganizationServices } from "@/services/organizations";
-import type { AvailabilitySlot, Branch, Organization, Service } from "@/types/domain";
+import type { AvailabilitySlot, Branch, Service } from "@/types/domain";
 
 export type BookingDay = {
   date: string;

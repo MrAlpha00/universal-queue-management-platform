@@ -6,6 +6,7 @@ import {
   CalendarClock,
   ChartNoAxesCombined,
   Fingerprint,
+  Fingerprint,
   QrCode,
   SlidersHorizontal,
   UsersRound,

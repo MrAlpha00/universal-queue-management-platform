@@ -92,7 +92,7 @@ export default async function ManageOverviewPage({
 
         <div className="space-y-5">
           <Card className="p-6">
-            <h2 className="text-base font-bold">Today's flow</h2>
+            <h2 className="text-base font-bold">Today&apos;s flow</h2>
             <div className="mt-5 space-y-4">
               {[
                 { label: "Booked", value: booked, tone: "violet" as const },

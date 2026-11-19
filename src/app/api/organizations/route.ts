@@ -1,4 +1,4 @@
-import { apiError, apiSuccess, withApiHandler } from "@/lib/api";
+import { apiError, apiSuccess } from "@/lib/api";
 import { z } from "zod";
 import { createOrganization } from "@/services/organizations";
 

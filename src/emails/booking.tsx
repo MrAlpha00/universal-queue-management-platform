@@ -51,7 +51,7 @@ export function BookingConfirmationEmail({
 
       <Text style={{ color: "#6B779A", fontSize: 12, lineHeight: 1.6, margin: "22px 0 0" }}>
         Need to change your plans? Open your dashboard to reschedule or cancel. Please review the
-        organization's booking policy before making changes.
+        organization&apos;s booking policy before making changes.
       </Text>
       <PrimaryButton href={dashboardUrl}>Open dashboard</PrimaryButton>
     </EmailShell>

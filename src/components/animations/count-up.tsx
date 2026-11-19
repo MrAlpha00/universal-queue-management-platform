@@ -19,7 +19,7 @@ export function CountUp({
   const ref = React.useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
   const raw = useMotionValue(0);
-  const spring = useSpring(raw, { stiffness: 90, damping: 22, mass: 0.6 });
+  const spring = useSpring(raw, { duration: duration * 1000, bounce: 0 });
   const display = useTransform(spring, (latest) =>
     `${prefix}${Math.round(latest).toLocaleString("en-US")}${suffix}`,
   );

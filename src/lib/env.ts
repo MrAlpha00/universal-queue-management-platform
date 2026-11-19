@@ -8,6 +8,8 @@ const serverEnvKeys = [
 
 export type ServerEnvKey = (typeof serverEnvKeys)[number];
 
+export const SERVER_ENV_KEYS = serverEnvKeys;
+
 export function getServerEnv(key: ServerEnvKey): string | undefined {
   return process.env[key];
 }
