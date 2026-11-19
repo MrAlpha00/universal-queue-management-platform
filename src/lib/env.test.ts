@@ -18,9 +18,9 @@ describe("requireServerEnv", () => {
   });
 
   it("throws a helpful error when a secret is missing", () => {
-    vi.stubEnv("QR_SIGNING_SECRET", "");
-    expect(() => requireServerEnv("QR_SIGNING_SECRET")).toThrow(/QR_SIGNING_SECRET/);
-    expect(() => requireServerEnv("QR_SIGNING_SECRET")).toThrow(/docs\/setup\.md/);
+    vi.stubEnv("TRIGGER_SECRET_KEY", "");
+    expect(() => requireServerEnv("TRIGGER_SECRET_KEY")).toThrow(/TRIGGER_SECRET_KEY/);
+    expect(() => requireServerEnv("TRIGGER_SECRET_KEY")).toThrow(/docs\/setup\.md/);
   });
 
   it("lists every required server key", () => {
@@ -29,7 +29,6 @@ describe("requireServerEnv", () => {
       "RESEND_API_KEY",
       "RESEND_FROM_EMAIL",
       "TRIGGER_SECRET_KEY",
-      "QR_SIGNING_SECRET",
     ]);
   });
 });

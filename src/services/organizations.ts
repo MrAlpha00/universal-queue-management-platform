@@ -84,6 +84,15 @@ export async function createOrganization(input: {
 }) {
   const session = await requireSession();
   const supabase = await createClient();
+
+  const { data: registrationOpen, error: registrationError } = await supabase.rpc(
+    "organization_registration_open",
+  );
+  if (registrationError) throw registrationError;
+  if (registrationOpen === false) {
+    throw errors.forbidden("Organization registration is currently closed");
+  }
+
   const slug = slugify(input.slug || input.name);
   if (!slug) throw errors.validation("A valid organization slug is required");
 
@@ -104,9 +113,19 @@ export async function createOrganization(input: {
     .single();
   if (error) {
     if (error.code === "23505") throw errors.conflict("That URL slug is already taken");
+    if (error.message.includes("registration is currently closed")) {
+      throw errors.forbidden("Organization registration is currently closed");
+    }
     throw error;
   }
   return data as Organization;
+}
+
+export async function isOrganizationRegistrationOpen() {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("organization_registration_open");
+  if (error) throw error;
+  return data !== false;
 }
 
 export async function updateOrganization(orgId: string, patch: Partial<Organization>) {

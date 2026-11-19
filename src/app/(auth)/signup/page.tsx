@@ -40,6 +40,15 @@ export default function SignupPage() {
       return;
     }
     const supabase = createClient();
+    if (values.accountType === "organization") {
+      const { data: registrationOpen } = await supabase.rpc("organization_registration_open");
+      if (registrationOpen === false) {
+        toast.error("Organization registration is currently closed", {
+          description: "You can still create a customer account and book appointments.",
+        });
+        return;
+      }
+    }
     const { data, error } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,

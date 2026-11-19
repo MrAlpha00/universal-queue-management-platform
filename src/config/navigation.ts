@@ -46,6 +46,12 @@ export const customerNav: NavItem[] = [
     description: "Find a service near you",
   },
   {
+    label: "Create organization",
+    href: "/onboarding/organization",
+    icon: Building2,
+    description: "Set up a management workspace",
+  },
+  {
     label: "My appointments",
     href: "/appointments",
     icon: CalendarCheck2,

@@ -2,7 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { toAppError } from "@/lib/errors";
+import { organizationCreateSchema } from "@/lib/validation";
 import { createClient } from "@/lib/supabase/server";
+import { createOrganization } from "@/services/organizations";
 import { requireSession } from "@/services/auth";
 
 const profileSchema = z.object({
@@ -32,6 +35,19 @@ export async function updateProfile(input: z.input<typeof profileSchema>) {
   revalidatePath("/profile");
   revalidatePath("/settings");
   return { ok: true };
+}
+
+export async function createOrganizationAction(input: z.input<typeof organizationCreateSchema>) {
+  try {
+    const values = organizationCreateSchema.parse(input);
+    const org = await createOrganization(values);
+    revalidatePath("/organizations");
+    revalidatePath("/dashboard");
+    return { ok: true as const, slug: org.slug, status: org.status };
+  } catch (error) {
+    const appError = toAppError(error);
+    return { ok: false as const, error: appError.message };
+  }
 }
 
 export async function changePassword(input: { currentPassword: string; newPassword: string }) {

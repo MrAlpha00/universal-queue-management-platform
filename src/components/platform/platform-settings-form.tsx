@@ -36,7 +36,7 @@ const metadata: Record<
   },
   allow_public_registration: {
     label: "Allow public registration",
-    description: "Let anyone create an organization from the marketing site.",
+    description: "Let anyone create a new organization workspace from onboarding.",
     icon: UserPlus,
     type: "boolean",
   },

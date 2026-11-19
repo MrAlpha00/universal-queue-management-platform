@@ -91,22 +91,21 @@ corepack pnpm dev`}</Code>
                 <h2 className="text-xl font-bold">Environment</h2>
                 <p className="mt-3 text-sm leading-relaxed text-muted">
                   Public values use the <code className="text-cyan-200">NEXT_PUBLIC_</code> prefix. The
-                  service-role key, Resend key, Trigger.dev key and QR signing secret must never be
-                  exposed to the browser.
+                  service-role key, Resend key and Trigger.dev secret must never be exposed to the
+                  browser.
                 </p>
                 <Code>{`NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 RESEND_API_KEY=
 RESEND_FROM_EMAIL=
+TRIGGER_PROJECT_ID=
 TRIGGER_SECRET_KEY=
-QR_SIGNING_SECRET=
 NEXT_PUBLIC_APP_URL=`}</Code>
                 <p className="mt-4 text-sm leading-relaxed text-muted">
-                  Generate the signing secret with{" "}
-                  <code className="text-cyan-200">openssl rand -base64 48</code>. Configure the
-                  Supabase redirect URLs for <code className="text-cyan-200">/auth/callback</code> and
-                  verify your sending domain in Resend before enabling reminders.
+                  Configure the Supabase redirect URLs for{" "}
+                  <code className="text-cyan-200">/auth/callback</code> and verify your sending
+                  domain in Resend before enabling reminders.
                 </p>
               </Card>
             </Reveal>
@@ -139,6 +138,10 @@ supabase db push`}</Code>
                   <p>
                     <strong className="text-foreground">0004–0005</strong> — management and platform
                     console functions, including organization approval and platform settings.
+                  </p>
+                  <p>
+                    <strong className="text-foreground">0006</strong> — explicit function grants.
+                    Internal helpers and trigger functions are removed from the public RPC surface.
                   </p>
                 </div>
               </Card>

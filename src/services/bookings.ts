@@ -91,7 +91,7 @@ const APPOINTMENT_SELECT = `
   appointment_date, start_time, end_time, start_at, end_at, timezone,
   status, responses, notes, source, created_at, updated_at,
   token:tokens(id, token_number, status, issued_at),
-  service:services(id, name, slug, duration_minutes, color),
+  service:services(id, name, slug, duration_minutes, color, allow_cancellation, cancellation_hours),
   branch:branches(id, name, slug),
   organization:organizations(id, name, slug, logo_url, timezone, settings),
   customer:profiles(id, full_name, email, avatar_url, phone)

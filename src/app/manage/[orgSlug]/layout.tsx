@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Clock3 } from "lucide-react";
 import { DashboardShell, SetupRequired } from "@/components/layout/dashboard-shell";
 import { Badge } from "@/components/ui/badge";
 import { managementNav } from "@/config/navigation";
@@ -29,6 +29,14 @@ export default async function ManagementLayout({
   }
 
   const { org, role, session: activeSession } = context;
+  const statusNotice =
+    org.status === "PENDING"
+      ? "This organization is awaiting platform review. You can configure services, schedules and staff now; customer booking opens after approval."
+      : org.status === "SUSPENDED"
+        ? "This organization is suspended. Customer booking and public discovery are disabled until a platform administrator restores access."
+        : org.status === "REJECTED"
+          ? "This organization registration was rejected. Contact platform support if you believe this is a mistake."
+          : null;
 
   return (
     <DashboardShell
@@ -56,6 +64,12 @@ export default async function ManagementLayout({
         </div>
       }
     >
+      {statusNotice && (
+        <div className="mb-5 flex items-start gap-3 rounded-2xl border border-amber-400/20 bg-amber-500/[0.07] px-4 py-3 text-xs leading-relaxed text-amber-100">
+          <Clock3 className="mt-0.5 size-4 shrink-0 text-amber-300" />
+          <p>{statusNotice}</p>
+        </div>
+      )}
       {children}
     </DashboardShell>
   );

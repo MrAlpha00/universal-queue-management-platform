@@ -3,7 +3,6 @@ const serverEnvKeys = [
   "RESEND_API_KEY",
   "RESEND_FROM_EMAIL",
   "TRIGGER_SECRET_KEY",
-  "QR_SIGNING_SECRET",
 ] as const;
 
 export type ServerEnvKey = (typeof serverEnvKeys)[number];

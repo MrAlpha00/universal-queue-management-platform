@@ -8,6 +8,7 @@ const PROTECTED_PREFIXES = [
   "/appointments",
   "/profile",
   "/settings",
+  "/onboarding",
   "/manage",
   "/platform",
 ];
