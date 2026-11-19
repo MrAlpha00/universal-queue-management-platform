@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { apiError, apiSuccess } from "@/lib/api";
+import { bookingInputSchema } from "@/lib/validation";
 import { createClient } from "@/lib/supabase/server";
 import { createBooking } from "@/services/bookings";
 import { getOrganizationBySlug } from "@/services/organizations";
@@ -14,17 +14,9 @@ import {
 } from "@/services/notifications";
 import type { Organization, Profile, Service, Branch } from "@/types/domain";
 
-const schema = z.object({
-  serviceId: z.string().uuid(),
-  branchId: z.string().uuid(),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  startTime: z.string().regex(/^\d{2}:\d{2}/),
-  responses: z.record(z.string(), z.unknown()).default({}),
-});
-
 export async function POST(request: Request) {
   try {
-    const input = schema.parse(await request.json());
+    const input = bookingInputSchema.parse(await request.json());
     const booking = await createBooking(input);
     const org = await getOrganizationBySlug(booking.org_slug);
 

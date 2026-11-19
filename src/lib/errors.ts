@@ -1,3 +1,5 @@
+import { ZodError } from "zod";
+
 export type ErrorCode =
   | "UNAUTHORIZED"
   | "FORBIDDEN"
@@ -72,6 +74,16 @@ export const errors = {
 
 export function toAppError(error: unknown): AppError {
   if (error instanceof AppError) return error;
+  if (error instanceof ZodError) {
+    return new AppError(
+      "VALIDATION",
+      "Please check the information provided",
+      error.issues.map((issue) => ({
+        path: issue.path.join("."),
+        message: issue.message,
+      })),
+    );
+  }
   console.error("[TokenFlow] Unexpected error", error);
   return new AppError("INTERNAL", "Something went wrong. Please try again.");
 }

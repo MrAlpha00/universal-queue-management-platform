@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { apiError, apiSuccess } from "@/lib/api";
+import { bookingCancelSchema } from "@/lib/validation";
 import { createClient } from "@/lib/supabase/server";
 import { cancelBooking } from "@/services/bookings";
 import { AppointmentStatusEmail } from "@/emails/status";
@@ -13,12 +13,10 @@ import {
 } from "@/services/notifications";
 import type { Organization, Profile, Service } from "@/types/domain";
 
-const schema = z.object({ reason: z.string().max(500).optional() });
-
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const body = schema.parse(await request.json().catch(() => ({})));
+    const body = bookingCancelSchema.parse(await request.json().catch(() => ({})));
     const result = await cancelBooking(id, body.reason);
     await cancelReminders(id);
 
