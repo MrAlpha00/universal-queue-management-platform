@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, CalendarCheck2, Clock3, QrCode, Ticket } from "lucide-react";
 import { WelcomeBanner } from "@/components/dashboard/welcome-banner";
 import { CountUp } from "@/components/animations/count-up";
+import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -56,10 +57,10 @@ export default async function CustomerDashboardPage() {
       <WelcomeBanner name={session.profile.full_name || session.email || "there"} hasAppointment={Boolean(next)} />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Upcoming appointments" value={<CountUp value={active} /> as unknown as string} icon={CalendarCheck2} tone="violet" hint="Active bookings" />
-        <StatCard label="Completed visits" value={<CountUp value={completed} /> as unknown as string} icon={Ticket} tone="teal" hint="All time" />
-        <StatCard label="Active tokens" value={tokenStatus} icon={QrCode} tone="cyan" hint="Ready for check-in" />
-        <StatCard label="Total bookings" value={<CountUp value={appointments.length} /> as unknown as string} icon={Clock3} tone="amber" hint="Your history" />
+        <StatCard label="Upcoming appointments" value={<CountUp value={active} />} icon={CalendarCheck2} tone="violet" hint="Active bookings" />
+        <StatCard label="Completed visits" value={<CountUp value={completed} />} icon={Ticket} tone="teal" hint="All time" />
+        <StatCard label="Active tokens" value={<CountUp value={tokenStatus} />} icon={QrCode} tone="cyan" hint="Ready for check-in" />
+        <StatCard label="Total bookings" value={<CountUp value={appointments.length} />} icon={Clock3} tone="amber" hint="Your history" />
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">

@@ -4,7 +4,7 @@ import { slugify } from "@/lib/utils";
 import { getCurrentSession, requirePlatformAdmin, requireSession } from "@/services/auth";
 import { logAudit } from "@/services/audit";
 import type { OrganizationStatus } from "@/config/constants";
-import type { Organization, Service, Branch } from "@/types/domain";
+import type { Organization, Service, ServiceField, Branch } from "@/types/domain";
 
 export async function listPublicOrganizations(search?: string) {
   const supabase = await createClient();
@@ -184,4 +184,47 @@ export async function getCurrentUserOrganizations() {
   return ((data ?? []) as unknown as Array<{ role: string; organizations: Organization }>)
     .map((row) => ({ role: row.role, org: row.organizations }))
     .filter((row) => row.org);
+}
+
+export async function getPublicOrganizationDetail(slug: string) {
+  const supabase = await createClient();
+  const { data: orgData, error } = await supabase
+    .from("organizations")
+    .select("*")
+    .eq("slug", slug)
+    .eq("status", "APPROVED")
+    .maybeSingle();
+  if (error) throw error;
+  if (!orgData) return null;
+  const org = orgData as Organization;
+
+  const [branches, services] = await Promise.all([
+    getOrganizationBranches(org.id),
+    getOrganizationServices(org.id),
+  ]);
+  if (!branches.length || !services.length) return null;
+
+  const serviceIds = services.map((s) => s.id);
+  const { data: fieldData } = await supabase
+    .from("service_fields")
+    .select("*")
+    .in("service_id", serviceIds)
+    .eq("is_active", true)
+    .order("display_order");
+
+  const fieldsByService = new Map<string, Service["service_fields"]>();
+  for (const field of (fieldData ?? []) as unknown as ServiceField[]) {
+    const list = fieldsByService.get(field.service_id) ?? [];
+    list.push(field);
+    fieldsByService.set(field.service_id, list);
+  }
+
+  return {
+    org,
+    branches,
+    services: services.map((service) => ({
+      ...service,
+      service_fields: fieldsByService.get(service.id) ?? [],
+    })),
+  };
 }

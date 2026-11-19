@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -12,7 +13,7 @@ export function StatCard({
   className,
 }: {
   label: string;
-  value: string | number;
+  value: ReactNode;
   icon: LucideIcon;
   tone?: "violet" | "cyan" | "teal" | "coral" | "amber";
   hint?: string;

@@ -24,14 +24,23 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     try {
       const supabase = await createClient();
-      const [orgRes, serviceRes, profileRes, tokenRes] = await Promise.all([
+      const [orgRes, appointmentRes, profileRes, tokenRes] = await Promise.all([
         supabase.from("organizations").select("*").eq("id", result.org_id).maybeSingle(),
-        supabase.from("services").select("*").eq("id", (await supabase.from("appointments").select("service_id").eq("id", id).maybeSingle()).data?.service_id ?? "").maybeSingle(),
+        supabase
+          .from("appointments")
+          .select("service_id, appointment_date, start_time, end_time")
+          .eq("id", id)
+          .maybeSingle(),
         supabase.from("profiles").select("*").eq("id", result.customer_id).maybeSingle(),
         supabase.from("tokens").select("token_number").eq("appointment_id", id).maybeSingle(),
       ]);
       const org = orgRes.data as Organization | null;
-      const service = serviceRes.data as Service | null;
+      const appointment = appointmentRes.data as
+        | { service_id: string; appointment_date: string; start_time: string; end_time: string }
+        | null;
+      const service = appointment
+        ? ((await supabase.from("services").select("*").eq("id", appointment.service_id).maybeSingle()).data as Service | null)
+        : null;
       const profile = profileRes.data as Profile | null;
       if (org && profile?.email) {
         const links = bookingLinks(org.slug, id);
@@ -42,8 +51,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
             customerName: profile.full_name || profile.email,
             organizationName: org.name,
             serviceName: service?.name ?? "Service",
-            date: formatAppointmentDate(new Date(result.start_at).toISOString().slice(0, 10), org.timezone),
-            time: formatTimeLabel("00:00", "00:00"),
+            date: formatAppointmentDate(
+              appointment?.appointment_date ?? new Date(result.start_at).toISOString().slice(0, 10),
+              org.timezone,
+            ),
+            time: formatTimeLabel(
+              appointment?.start_time ?? "00:00",
+              appointment?.end_time ?? "00:00",
+            ),
             tokenNumber: (tokenRes.data as { token_number?: string } | null)?.token_number ?? "—",
             event: "cancelled",
             note: body.reason,
