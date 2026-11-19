@@ -1,5 +1,62 @@
 -- TokenFlow · privileged management RPCs (all server-authorized).
 
+-- Public, read-only slot discovery. Generates slots lazily from configured
+-- working hours so customers see real availability before the first booking.
+create or replace function public.get_available_slots(
+  p_service uuid,
+  p_branch uuid,
+  p_date date
+)
+returns table (
+  id uuid,
+  start_time time,
+  end_time time,
+  capacity integer,
+  booked_count integer
+)
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare
+  v_org uuid;
+  v_status public.organization_status;
+  v_active boolean;
+  v_tz text;
+  v_today date;
+  v_horizon integer;
+begin
+  select s.org_id, s.is_active, o.status,
+         coalesce(o.settings ->> 'timezone', o.timezone, 'UTC'),
+         coalesce(s.booking_horizon_days, (o.settings ->> 'booking_horizon_days')::integer,
+                  public.setting_int('default_booking_horizon_days', 3), 3)
+  into v_org, v_active, v_status, v_tz, v_horizon
+  from public.services s join public.organizations o on o.id = s.org_id
+  where s.id = p_service;
+
+  if not found or not v_active or v_status <> 'APPROVED' then
+    return;
+  end if;
+
+  v_today := (now() at time zone v_tz)::date;
+  if p_date < v_today or p_date > v_today + (v_horizon - 1) then
+    return;
+  end if;
+
+  perform public.generate_slots(p_service, p_branch, p_date, p_date);
+
+  return query
+    select s.id, s.start_time, s.end_time, s.capacity, s.booked_count
+    from public.availability_slots s
+    where s.service_id = p_service
+      and s.branch_id = p_branch
+      and s.slot_date = p_date
+      and s.status = 'OPEN'
+      and s.booked_count < s.capacity
+      and (p_date > v_today or s.start_time > (now() at time zone v_tz)::time)
+    order by s.start_time;
+end;
+$$;
+
+grant execute on function public.get_available_slots(uuid, uuid, date) to anon, authenticated;
+
 create or replace function public.admin_generate_slots(
   p_service uuid,
   p_start_date date,
