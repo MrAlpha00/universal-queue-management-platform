@@ -15,7 +15,7 @@ Browser
   │  HTML / RSC / JSON
   ▼
 Next.js on Vercel
-  ├── proxy/middleware ── refreshes Supabase auth cookies, gates protected routes
+  ├── proxy ──────────────── refreshes Supabase auth cookies, gates protected routes
   ├── Server Components ── render with the caller's cookie session (RLS)
   ├── Route Handlers    ── typed JSON envelope for the public API
   ├── Server Actions    ── authenticated management mutations
@@ -47,7 +47,7 @@ Server components are the default. Client components are used only where interac
 
 ### Page request
 
-1. Middleware (`src/middleware.ts` → `src/lib/supabase/middleware.ts`) refreshes the Supabase session cookies.
+1. The proxy (`src/proxy.ts` → `src/lib/supabase/proxy.ts`) refreshes the Supabase session cookies.
 2. If Supabase is not configured, protected prefixes redirect to `/login?setup=1`.
 3. If there is no user and the route is protected, the user is redirected to `/login?next=…`.
 4. If there is a user on an auth page, they are redirected to `/dashboard`.
@@ -167,4 +167,4 @@ Scanning also expires a stale token lazily, so check-in remains correct if the c
 - The product is hardware-free; scanning uses the device camera or manual entry.
 - Organization approval is manual unless auto-approval is enabled.
 - Migrations must be validated against a disposable Supabase project before production rollout.
-- `middleware` is still the Next.js convention in this release; Next warns that `proxy` is the preferred name in newer versions.
+- The Next.js 16 `proxy` convention is used instead of the deprecated `middleware` name. Route protection compares full path segments, so public pages such as `/platform-capabilities` are not mistaken for the `/platform` console.

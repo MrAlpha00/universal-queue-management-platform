@@ -125,7 +125,7 @@ Trigger.dev uses the service-role key. Treat that environment as production-sens
 ### Build behavior
 
 - `output` is not overridden; Vercel uses the standard Next.js build.
-- Middleware refreshes Supabase session cookies. Next.js currently warns that `middleware` will be renamed to `proxy`; the warning is expected in this release.
+- The `src/proxy.ts` convention refreshes Supabase session cookies. `allowDevOrigins` permits `127.0.0.1` for Playwright's dev server.
 - Page routes that read session or database state are `force-dynamic`; there is no attempt to statically cache tenant data.
 - `next.config.ts` sets security headers: `nosniff`, `strict-origin-when-cross-origin`, `DENY` framing and a camera-only permissions policy.
 

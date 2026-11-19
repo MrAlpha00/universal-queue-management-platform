@@ -20,7 +20,7 @@ The service-role client is `createAdminClient()` in `src/lib/supabase/server.ts`
 ## Authentication and sessions
 
 - Supabase Auth handles sign-up, login, email confirmation, password recovery and session refresh.
-- Sessions are stored in cookies through `@supabase/ssr`. Middleware refreshes cookies on every matched request and redirects unauthenticated users away from protected prefixes.
+- Sessions are stored in cookies through `@supabase/ssr`. The Next.js proxy refreshes cookies on every matched request and redirects unauthenticated users away from protected prefixes. Route matching uses whole segments, so `/platform-capabilities` stays public while `/platform/*` is protected.
 - Protected prefixes: `/dashboard`, `/appointments`, `/profile`, `/settings`, `/onboarding`, `/manage`, `/platform`.
 - When Supabase public configuration is missing, protected routes redirect to `/login?setup=1` and show explicit setup guidance instead of throwing.
 - Signed-in users visiting `/login`, `/signup` or `/forgot-password` are redirected to `/dashboard`.

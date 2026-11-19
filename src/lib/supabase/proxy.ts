@@ -2,25 +2,14 @@ import { createServerClient } from "@supabase/ssr";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { hasSupabaseConfig } from "@/lib/env";
-
-const PROTECTED_PREFIXES = [
-  "/dashboard",
-  "/appointments",
-  "/profile",
-  "/settings",
-  "/onboarding",
-  "/manage",
-  "/platform",
-];
-
-const AUTH_PAGES = ["/login", "/signup", "/forgot-password"];
+import { isAuthPage, isProtectedRoute } from "@/lib/routes";
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   if (!hasSupabaseConfig()) {
     const path = request.nextUrl.pathname;
-    if (PROTECTED_PREFIXES.some((prefix) => path.startsWith(prefix))) {
+    if (isProtectedRoute(path)) {
       const url = request.nextUrl.clone();
       url.pathname = "/login";
       url.searchParams.set("setup", "1");
@@ -51,16 +40,15 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  const isProtected = PROTECTED_PREFIXES.some((prefix) => path.startsWith(prefix));
 
-  if (!user && isProtected) {
+  if (!user && isProtectedRoute(path)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("next", path + request.nextUrl.search);
     return NextResponse.redirect(url);
   }
 
-  if (user && AUTH_PAGES.includes(path)) {
+  if (user && isAuthPage(path)) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);

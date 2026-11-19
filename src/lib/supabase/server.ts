@@ -25,7 +25,7 @@ export async function createClient() {
               cookieStore.set(name, value, options);
             });
           } catch {
-            // Server Components cannot write cookies; middleware refreshes them.
+            // Server Components cannot write cookies; the proxy refreshes them.
           }
         },
       },
