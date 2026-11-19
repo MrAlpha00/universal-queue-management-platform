@@ -12,6 +12,7 @@ import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { safeRedirectPath } from "@/lib/redirects";
 import { createClient } from "@/lib/supabase/client";
 import { hasSupabaseConfig } from "@/lib/env";
 
@@ -51,7 +52,7 @@ function LoginContent() {
       return;
     }
     toast.success("Welcome back");
-    router.push(params.get("next") || "/dashboard");
+    router.push(safeRedirectPath(params.get("next")));
     router.refresh();
   }
 
