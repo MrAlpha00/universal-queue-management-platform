@@ -78,9 +78,6 @@ export function BookingFlow({
   React.useEffect(() => {
     if (step !== 2 || !serviceId || !branchId || !date) return;
     let cancelled = false;
-    setLoadingSlots(true);
-    setSlots([]);
-    setStartTime("");
     fetch(`/api/organizations/${orgSlug}/availability?serviceId=${serviceId}&branchId=${branchId}&date=${date}`)
       .then(async (res) => {
         const json = await res.json();
@@ -251,7 +248,12 @@ export function BookingFlow({
               <button
                 key={day.date}
                 type="button"
-                onClick={() => setDate(day.date)}
+                onClick={() => {
+                  setDate(day.date);
+                  setSlots([]);
+                  setStartTime("");
+                  setLoadingSlots(true);
+                }}
                 className={cn(
                   "flex min-w-[72px] shrink-0 flex-col items-center rounded-xl border px-3 py-2.5 transition",
                   date === day.date
@@ -438,7 +440,14 @@ export function BookingFlow({
             <ArrowLeft className="size-4" /> Back
           </Button>
           {step < 3 ? (
-            <Button variant="cyan" disabled={!canContinue} onClick={() => setStep((s) => (s + 1) as Step)}>
+            <Button variant="cyan" disabled={!canContinue} onClick={() => {
+              if (step === 1) {
+                setSlots([]);
+                setStartTime("");
+                setLoadingSlots(true);
+              }
+              setStep((s) => (s + 1) as Step);
+            }}>
               Continue <ArrowRight className="size-4" />
             </Button>
           ) : (

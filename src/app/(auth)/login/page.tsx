@@ -25,9 +25,7 @@ export default function LoginPage() {
   const router = useRouter();
   const params = useSearchParams();
   const [show, setShow] = React.useState(false);
-  const [ready, setReady] = React.useState(false);
-
-  React.useEffect(() => setReady(hasSupabaseConfig()), []);
+  const ready = hasSupabaseConfig();
 
   const form = useForm<Values>({ resolver: zodResolver(schema), defaultValues: { email: "", password: "" } });
 

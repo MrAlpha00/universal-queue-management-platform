@@ -46,8 +46,6 @@ export function DashboardShell({
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
 
-  React.useEffect(() => setMobileOpen(false), [pathname]);
-
   const filtered = nav.filter((item) =>
     item.label.toLowerCase().includes(query.toLowerCase().trim()),
   );
@@ -106,6 +104,7 @@ export function DashboardShell({
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => setMobileOpen(false)}
               className={cn(
                 "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all",
                 active
@@ -152,10 +151,10 @@ export function DashboardShell({
             <div className="px-3 py-1.5 text-xs text-muted">{user.email}</div>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href="/profile"><Settings2 className="size-4" /> My profile</Link>
+              <Link href="/profile" onClick={() => setMobileOpen(false)}><Settings2 className="size-4" /> My profile</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/settings"><Settings2 className="size-4" /> Preferences</Link>
+              <Link href="/settings" onClick={() => setMobileOpen(false)}><Settings2 className="size-4" /> Preferences</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <form action="/auth/sign-out" method="post">

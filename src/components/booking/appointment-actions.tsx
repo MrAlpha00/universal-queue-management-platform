@@ -43,9 +43,6 @@ export function AppointmentActions({
   React.useEffect(() => {
     if (!rescheduleOpen) return;
     let cancelled = false;
-    setLoadingSlots(true);
-    setSlots([]);
-    setStartTime("");
     const slug = appointment.organization?.slug;
     if (!slug) return;
     fetch(`/api/organizations/${slug}/availability?serviceId=${appointment.service_id}&branchId=${appointment.branch_id}&date=${date}`)
@@ -111,7 +108,17 @@ export function AppointmentActions({
     <div className="flex flex-wrap gap-2">
       <Dialog open={rescheduleOpen} onOpenChange={setRescheduleOpen}>
         <DialogTrigger asChild>
-          <Button variant="secondary" size="sm"><CalendarClock className="size-3.5" /> Reschedule</Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              setSlots([]);
+              setStartTime("");
+              setLoadingSlots(true);
+            }}
+          >
+            <CalendarClock className="size-3.5" /> Reschedule
+          </Button>
         </DialogTrigger>
         <DialogContent size="wide">
           <DialogHeader>
@@ -120,7 +127,12 @@ export function AppointmentActions({
           </DialogHeader>
           <DialogBody>
             <Field label="Date">
-              <SelectNative value={date} onChange={(e) => setDate(e.target.value)}>
+              <SelectNative value={date} onChange={(e) => {
+                setDate(e.target.value);
+                setSlots([]);
+                setStartTime("");
+                setLoadingSlots(true);
+              }}>
                 {days.map((day) => (
                   <option key={day.date} value={day.date}>{day.label} · {day.day} {day.month}</option>
                 ))}

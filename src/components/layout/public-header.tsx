@@ -22,8 +22,6 @@ export function PublicHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  React.useEffect(() => setOpen(false), [pathname]);
-
   return (
     <header className="fixed inset-x-0 top-0 z-40 px-4 pt-4 sm:px-6 lg:pt-5">
       <div
@@ -97,6 +95,7 @@ export function PublicHeader() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={() => setOpen(false)}
                   className="rounded-xl px-4 py-3 text-sm font-medium text-muted transition hover:bg-white/[0.05] hover:text-foreground"
                 >
                   {item.label}
