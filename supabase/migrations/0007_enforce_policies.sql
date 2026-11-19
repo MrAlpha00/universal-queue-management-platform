@@ -17,8 +17,10 @@ returns boolean language sql stable security definer set search_path = public, p
   );
 $$;
 
-revoke execute on function public.organization_registration_open() from public, anon;
-grant execute on function public.organization_registration_open() to authenticated;
+-- This is a read-only boolean used by the sign-up screen before authentication,
+-- so anonymous clients may call it. It exposes no tenant data.
+revoke execute on function public.organization_registration_open() from public;
+grant execute on function public.organization_registration_open() to anon, authenticated;
 
 -- Re-create the defaults trigger with the registration gate. Platform
 -- administrators can still create organizations while registration is closed.

@@ -44,6 +44,7 @@ Configuration: `vitest.config.mts`. The environment is `jsdom`, globals are enab
 | `src/lib/env.test.ts` | Lazy environment parsing, app URL fallback and integration readiness |
 | `src/lib/cancellation.test.ts` | Cancellation status, service switch and cutoff boundary |
 | `src/lib/redirects.test.ts` | Same-origin post-auth redirects and encoded URL tricks |
+| `src/lib/routes.test.ts` | Whole-segment route protection and public-path lookalikes |
 | `src/services/availability.test.ts` | Booking-day generation in the organization timezone and horizon |
 | `src/services/notifications.test.ts` | Time labels, lead-time labels, date formatting, subjects and links |
 | `src/config/constants.test.ts` | Status/role lists and status style coverage |

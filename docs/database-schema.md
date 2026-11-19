@@ -302,6 +302,7 @@ All privileged functions are `SECURITY DEFINER` with `set search_path = public, 
 | `get_available_slots(p_service, p_branch, p_date)` | `anon`, `authenticated` | Returns open slots with capacity after lazy generation; refuses non-approved organizations and dates outside the horizon |
 | `generate_slots(p_service, p_branch, p_start, p_end)` | internal | Builds slots from working hours, exceptions, duration and buffer |
 | `admin_generate_slots(p_service, p_start, p_end)` | org `MANAGER`+ or platform admin | Generates slots for a service across its branch scope and writes an audit entry |
+| `organization_registration_open()` | `anon`, `authenticated` | Read-only flag used by the sign-up and onboarding screens; returns the `allow_public_registration` setting |
 
 ### Booking lifecycle
 
