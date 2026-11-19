@@ -57,7 +57,7 @@ Open `http://localhost:3000`.
    supabase db push
    ```
 
-   Alternatively, paste each file into the SQL editor in order (`0001` through `0006`).
+   Alternatively, paste each file into the SQL editor in order (`0001` through `0007`).
 3. Copy the project URL, publishable/anon key and service-role key into `.env.local`.
 4. In **Authentication → URL Configuration**, set the site URL and add `http://localhost:3000/auth/callback` plus your production callback URL.
 
@@ -196,7 +196,7 @@ src/
   services/            server-side data and domain services
   trigger/             reminder and expiration tasks
   types/               domain types
-supabase/migrations/   schema, functions, RLS, platform RPCs, grants
+supabase/migrations/   schema, functions, RLS, platform RPCs, grants, policy enforcement
 e2e/                   Playwright tests
 docs/                  operational and technical documentation
 ```

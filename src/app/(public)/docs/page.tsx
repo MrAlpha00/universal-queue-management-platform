@@ -143,6 +143,10 @@ supabase db push`}</Code>
                     <strong className="text-foreground">0006</strong> — explicit function grants.
                     Internal helpers and trigger functions are removed from the public RPC surface.
                   </p>
+                  <p>
+                    <strong className="text-foreground">0007</strong> — organization registration
+                    switch and service cancellation policy enforced in the database.
+                  </p>
                 </div>
               </Card>
             </Reveal>

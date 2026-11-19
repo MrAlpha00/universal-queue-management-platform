@@ -53,6 +53,7 @@ Without Supabase values, marketing pages still render and protected routes redir
    - `0004_admin_functions.sql` — availability discovery and management RPCs.
    - `0005_platform_console.sql` — platform role and setting RPCs.
    - `0006_harden_function_grants.sql` — explicit function grants; internal helpers are removed from the API surface.
+   - `0007_enforce_policies.sql` — registration gate and service cancellation policy enforced in the database.
 
    With the CLI:
 
@@ -61,7 +62,7 @@ Without Supabase values, marketing pages still render and protected routes redir
    supabase db push
    ```
 
-   Or paste each file into the Supabase SQL editor in order. Do not skip `0006`: earlier migrations rely on PostgreSQL's default `EXECUTE` grant to `PUBLIC`, which would expose internal helpers over PostgREST.
+   Or paste each file into the Supabase SQL editor in order. Do not skip `0006`: earlier migrations rely on PostgreSQL's default `EXECUTE` grant to `PUBLIC`, which would expose internal helpers over PostgREST. Do not skip `0007`: it enforces the registration switch and the customer cancellation policy.
 
 3. Verify the schema:
 
@@ -174,6 +175,8 @@ Open `http://localhost:3000`. The database starts empty by design: there is no s
 | No reminder emails | Resend or Trigger.dev not configured | Inspect `reminder_events` and `notification_events` |
 | Camera scanner does not start | Browser blocks camera on insecure origins | Use `localhost` or HTTPS and grant camera permission; manual entry always works |
 | `permission denied for function` | `0006` not applied, or calling an internal helper | Apply `0006`; call only documented RPCs |
+| Organization registration unexpectedly allowed or blocked | `0007` not applied, or platform setting changed | Apply `0007`; check `/platform/settings` |
+| Customer can cancel inside a closed window | `0007` not applied | Apply `0007` and re-test the service policy |
 | Build fails on missing env | `NEXT_PUBLIC_APP_URL` invalid | Use a valid absolute URL |
 
 ## 10. Next steps

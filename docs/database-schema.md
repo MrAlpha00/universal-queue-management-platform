@@ -12,6 +12,7 @@ Migrations live in `supabase/migrations/` and must be applied in numeric order.
 | `0004_admin_functions.sql` | Availability discovery and management RPCs |
 | `0005_platform_console.sql` | Platform role and setting RPCs |
 | `0006_harden_function_grants.sql` | Explicit function grants; internal helpers removed from the API surface |
+| `0007_enforce_policies.sql` | Organization registration gate and service cancellation policy enforced in the database |
 
 ## Entity relationships
 
@@ -286,13 +287,13 @@ Global key/value configuration. Seeded rows:
 | Key | Default | Effect |
 | --- | --- | --- |
 | `auto_approve_organizations` | `false` | New organizations skip manual review |
-| `allow_public_registration` | `true` | Intended switch for self-service registration; enforcement is a product policy |
+| `allow_public_registration` | `true` | New organizations can be created from onboarding; enforced by the defaults trigger and prechecked in the UI |
 | `default_booking_horizon_days` | `3` | Fallback horizon |
 | `maintenance_mode` | `false` | Blocks new bookings with a clear error |
 
 ## Database functions
 
-All privileged functions are `SECURITY DEFINER` with `set search_path = public, pg_temp`. Authorization is checked inside the function; `0006` removes `EXECUTE` from `PUBLIC` and grants only the intended roles.
+All privileged functions are `SECURITY DEFINER` with `set search_path = public, pg_temp`. Authorization is checked inside the function; `0006` removes `EXECUTE` from `PUBLIC` and grants only the intended roles. `0007` replaces the organization defaults trigger to honor `allow_public_registration`, adds the read-only `organization_registration_open()` helper, and re-creates `cancel_booking` with the customer cancellation policy below.
 
 ### Discovery and scheduling
 
@@ -307,7 +308,7 @@ All privileged functions are `SECURITY DEFINER` with `set search_path = public, 
 | Function | Caller | Behavior |
 | --- | --- | --- |
 | `create_booking(p_service, p_branch, p_slot_date, p_start_time, p_responses)` | `authenticated` | Validates organization, maintenance mode, horizon, branch, required fields, duplicates; locks the slot; inserts appointment, token and QR credential |
-| `cancel_booking(p_appointment, p_reason)` | owning customer, org `MANAGER`+, platform admin | Cancels only from `BOOKED`/`CHECKED_IN`; releases capacity; revokes token and QR; cancels reminder rows |
+| `cancel_booking(p_appointment, p_reason)` | owning customer, org `MANAGER`+, platform admin | Cancels only from `BOOKED`/`CHECKED_IN`; customers must be allowed by `services.allow_cancellation` and outside `cancellation_hours`; staff retain override; releases capacity; revokes token and QR; cancels reminder rows |
 | `reschedule_booking(p_appointment, p_service, p_branch, p_slot_date, p_start_time, p_responses)` | owning customer, org `MANAGER`+ | Creates a replacement appointment, then closes the original as `RESCHEDULED`; releases old capacity and revokes the old QR |
 | `update_appointment_status(p_appointment, p_status)` | org member (`STAFF` included) | Enforces the status transition table; revokes QR for terminal states |
 
@@ -350,7 +351,7 @@ All privileged functions are `SECURITY DEFINER` with `set search_path = public, 
 | --- | --- | --- |
 | `*_updated_at` | Most tables | Maintains `updated_at` |
 | `on_auth_user_created` | `auth.users` | Creates the profile row |
-| `organizations_defaults` | `organizations` (before insert) | Sets owner, approval status, default settings |
+| `organizations_defaults` | `organizations` (before insert) | Sets owner, approval status, default settings; rejects non-admin inserts while public registration is closed |
 | `organizations_after_created` | `organizations` (after insert) | Owner membership, main branch, weekday hours, audit entry |
 | `profiles_protect_role` | `profiles` | Blocks non-platform-admin role changes |
 | `organizations_protect_status` | `organizations` | Blocks non-platform-admin status changes |
@@ -380,6 +381,8 @@ Anonymous users can read approved discovery data and slots. They cannot read app
 - **Token independence** — each appointment owns its own token. Issuing token B never changes token A; only the appointment's own lifecycle affects its token.
 - **Capacity** — `booked_count` is incremented inside the locked booking transaction. Cancellation and reschedule decrement it with a floor of zero.
 - **Booking horizon** — validated in the organization timezone. The default is three calendar days including today. A service-level `booking_horizon_days` overrides the organization setting.
+- **Cancellation policy** — customers can cancel only from `BOOKED`/`CHECKED_IN`, when `services.allow_cancellation` is true, and before the `services.cancellation_hours` cutoff. Staff and platform administrators keep an override. The appointment page and `cancel_booking` apply the same rule.
+- **Registration policy** — `allow_public_registration` is checked in the organization defaults trigger and in the onboarding/signup UI. Platform administrators can still create organizations while registration is closed.
 - **Reminder cancellation** — cancellation and reschedule mark pending reminder rows `CANCELLED` and best-effort cancel Trigger.dev runs.
 - **No mock data** — migrations seed only `platform_settings`. All dashboards render real empty states.
 - **Validation** — before production, apply all migrations to a disposable project and exercise booking, duplicate scan, reschedule and expiration.
