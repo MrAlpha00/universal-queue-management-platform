@@ -5,8 +5,6 @@ import {
   Building2,
   CalendarClock,
   ChartNoAxesCombined,
-  Fingerprint,
-  Fingerprint,
   QrCode,
   SlidersHorizontal,
   UsersRound,
