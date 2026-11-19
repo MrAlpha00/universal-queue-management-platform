@@ -66,9 +66,9 @@ export async function getPlatformUserMemberships() {
   }>;
 }
 
-export async function listPlatformBookings(limit = 200) {
+export async function listPlatformBookings(limit = 200, status?: string) {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("appointments")
     .select(`
       id, appointment_date, start_time, end_time, status, created_at,
@@ -78,6 +78,8 @@ export async function listPlatformBookings(limit = 200) {
     `)
     .order("created_at", { ascending: false })
     .limit(limit);
+  if (status) query = query.eq("status", status);
+  const { data, error } = await query;
   if (error) throw error;
   return (data ?? []) as unknown as Array<{
     id: string;
