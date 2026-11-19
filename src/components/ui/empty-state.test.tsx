@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CalendarClock } from "lucide-react";
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
@@ -22,7 +23,7 @@ describe("EmptyState", () => {
         icon={CalendarClock}
         title="Nothing booked"
         description="Find a service to get started."
-        action={<a href="/organizations">Explore organizations</a>}
+        action={<Link href="/organizations">Explore organizations</Link>}
       />,
     );
     expect(screen.getByRole("link", { name: "Explore organizations" })).toHaveAttribute(

@@ -15,7 +15,7 @@ This document describes the controls in the repository. Deployment-specific cont
 | Database functions | `SECURITY DEFINER` owner | Re-check authorization inside each function; explicit grants |
 | Trigger.dev | Service role in its own environment | Only reminder and expiration work |
 
-The service-role client lives in `createAdminClient()` (`src/lib/supabase/admin` is intentionally absent — the helper is exported from `src/lib/supabase/server.ts`). Keep it out of `"use client"` modules and out of any component that ships to the browser.
+The service-role client is `createAdminClient()` in `src/lib/supabase/server.ts`. Keep it out of `"use client"` modules and out of any component that ships to the browser.
 
 ## Authentication and sessions
 
