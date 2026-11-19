@@ -9,7 +9,6 @@ import {
   QrCode,
   ScanLine,
   Ticket,
-  UserRound,
   UsersRound,
 } from "lucide-react";
 import { FinalCta } from "@/components/marketing/final-cta";
