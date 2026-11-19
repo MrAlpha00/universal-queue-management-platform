@@ -18,7 +18,7 @@ type ReminderPayload = {
 
 export const appointmentReminderTask = task({
   id: "appointment-reminder",
-  retry: { maxAttempts: 3, factor: 2, minDelayInMs: 1000, maxDelayInMs: 60_000 },
+  retry: { maxAttempts: 3, factor: 2, minTimeoutInMs: 1000, maxTimeoutInMs: 60_000 },
   run: async (payload: ReminderPayload) => {
     const admin = createAdminClient();
 

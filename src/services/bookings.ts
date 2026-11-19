@@ -108,7 +108,7 @@ export async function listCustomerAppointments(status?: string): Promise<Appoint
   if (status && status !== "ALL") query = query.eq("status", status);
   const { data, error } = await query;
   if (error) throw error;
-  return (data ?? []) as Appointment[];
+  return (data ?? []) as unknown as Appointment[];
 }
 
 export async function getNextCustomerAppointment(): Promise<Appointment | null> {
@@ -165,7 +165,7 @@ export async function listOrgAppointments(
   if (filters.serviceId && filters.serviceId !== "ALL") query = query.eq("service_id", filters.serviceId);
   const { data, error } = await query;
   if (error) throw error;
-  return (data ?? []) as Appointment[];
+  return (data ?? []) as unknown as Appointment[];
 }
 
 export async function listTodayAppointments(orgId: string, timezone: string): Promise<Appointment[]> {
@@ -184,7 +184,7 @@ export async function listCustomerHistory(orgId: string, limit = 200): Promise<A
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) throw error;
-  return (data ?? []) as Appointment[];
+  return (data ?? []) as unknown as Appointment[];
 }
 
 export async function listCheckInEvents(orgId: string, limit = 200): Promise<CheckInEvent[]> {

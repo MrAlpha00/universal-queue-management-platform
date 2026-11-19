@@ -167,7 +167,7 @@ export async function scheduleReminders(input: {
           },
           {
             idempotencyKey,
-            delay: Math.max(0, scheduledFor.getTime() - now),
+            delay: scheduledFor,
           },
         );
         await admin
