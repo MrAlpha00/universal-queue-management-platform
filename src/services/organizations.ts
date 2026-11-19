@@ -3,7 +3,8 @@ import { errors } from "@/lib/errors";
 import { slugify } from "@/lib/utils";
 import { getCurrentSession, requirePlatformAdmin, requireSession } from "@/services/auth";
 import { logAudit } from "@/services/audit";
-import type { Organization, OrganizationStatus, Service, Branch } from "@/types/domain";
+import type { OrganizationStatus } from "@/config/constants";
+import type { Organization, Service, Branch } from "@/types/domain";
 
 export async function listPublicOrganizations(search?: string) {
   const supabase = await createClient();
