@@ -10,7 +10,8 @@ import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
-import { Field, Input } from "@/components/ui/label";
+import { Field } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 import { hasSupabaseConfig } from "@/lib/env";
 

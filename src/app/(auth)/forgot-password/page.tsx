@@ -9,7 +9,8 @@ import { ArrowLeft, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
-import { Field, Input } from "@/components/ui/label";
+import { Field } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 
 const schema = z.object({ email: z.string().email("Enter a valid email") });
