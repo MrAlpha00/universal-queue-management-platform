@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { CalendarClock, Loader2, XCircle } from "lucide-react";
+import { CalendarClock, Info, Loader2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,9 +25,15 @@ type Slot = { id: string; start_time: string; end_time: string; capacity: number
 export function AppointmentActions({
   appointment,
   days,
+  canReschedule,
+  canCancel,
+  cancelMessage,
 }: {
   appointment: Appointment;
   days: BookingDay[];
+  canReschedule: boolean;
+  canCancel: boolean;
+  cancelMessage?: string | null;
 }) {
   const router = useRouter();
   const [rescheduleOpen, setRescheduleOpen] = React.useState(false);
@@ -105,102 +111,122 @@ export function AppointmentActions({
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
-      <Dialog open={rescheduleOpen} onOpenChange={setRescheduleOpen}>
-        <DialogTrigger asChild>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => {
-              setSlots([]);
-              setStartTime("");
-              setLoadingSlots(true);
-            }}
-          >
-            <CalendarClock className="size-3.5" /> Reschedule
-          </Button>
-        </DialogTrigger>
-        <DialogContent size="wide">
-          <DialogHeader>
-            <DialogTitle>Reschedule appointment</DialogTitle>
-            <DialogDescription>Choose a new date and time for your visit.</DialogDescription>
-          </DialogHeader>
-          <DialogBody>
-            <Field label="Date">
-              <SelectNative value={date} onChange={(e) => {
-                setDate(e.target.value);
-                setSlots([]);
-                setStartTime("");
-                setLoadingSlots(true);
-              }}>
-                {days.map((day) => (
-                  <option key={day.date} value={day.date}>{day.label} · {day.day} {day.month}</option>
-                ))}
-              </SelectNative>
-            </Field>
-            <div className="mt-5">
-              <p className="text-xs font-semibold text-muted">Available times</p>
-              {loadingSlots ? (
-                <p className="mt-3 flex items-center gap-2 text-sm text-subtle"><Loader2 className="size-4 animate-spin" /> Loading…</p>
-              ) : slots.length ? (
-                <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  {slots.map((slot) => {
-                    const remaining = slot.capacity - slot.booked_count;
-                    const disabled = remaining <= 0;
-                    return (
-                      <button
-                        key={slot.id}
-                        type="button"
-                        disabled={disabled}
-                        onClick={() => setStartTime(slot.start_time.slice(0, 5))}
-                        className={cn(
-                          "rounded-xl border px-2 py-2.5 text-xs font-semibold transition",
-                          disabled
-                            ? "cursor-not-allowed border-white/[0.05] text-subtle/50 line-through"
-                            : startTime === slot.start_time.slice(0, 5)
-                              ? "border-violet-400/50 bg-violet-500/12 text-violet-100"
-                              : "border-white/[0.09] bg-white/[0.025] hover:border-violet-400/30",
-                        )}
-                      >
-                        {slot.start_time.slice(0, 5)}
-                      </button>
-                    );
-                  })}
+    <div className="space-y-3">
+      <div className="flex flex-wrap gap-2">
+        {canReschedule && (
+          <Dialog open={rescheduleOpen} onOpenChange={setRescheduleOpen}>
+            <DialogTrigger asChild>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  setSlots([]);
+                  setStartTime("");
+                  setError("");
+                  setLoadingSlots(true);
+                }}
+              >
+                <CalendarClock className="size-3.5" /> Reschedule
+              </Button>
+            </DialogTrigger>
+            <DialogContent size="wide">
+              <DialogHeader>
+                <DialogTitle>Reschedule appointment</DialogTitle>
+                <DialogDescription>Choose a new date and time for your visit.</DialogDescription>
+              </DialogHeader>
+              <DialogBody>
+                <Field label="Date">
+                  <SelectNative value={date} onChange={(e) => {
+                    setDate(e.target.value);
+                    setSlots([]);
+                    setStartTime("");
+                    setLoadingSlots(true);
+                  }}>
+                    {days.map((day) => (
+                      <option key={day.date} value={day.date}>{day.label} · {day.day} {day.month}</option>
+                    ))}
+                  </SelectNative>
+                </Field>
+                <div className="mt-5">
+                  <p className="text-xs font-semibold text-muted">Available times</p>
+                  {loadingSlots ? (
+                    <p className="mt-3 flex items-center gap-2 text-sm text-subtle"><Loader2 className="size-4 animate-spin" /> Loading…</p>
+                  ) : slots.length ? (
+                    <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      {slots.map((slot) => {
+                        const remaining = slot.capacity - slot.booked_count;
+                        const disabled = remaining <= 0;
+                        return (
+                          <button
+                            key={slot.id}
+                            type="button"
+                            disabled={disabled}
+                            onClick={() => setStartTime(slot.start_time.slice(0, 5))}
+                            className={cn(
+                              "rounded-xl border px-2 py-2.5 text-xs font-semibold transition",
+                              disabled
+                                ? "cursor-not-allowed border-white/[0.05] text-subtle/50 line-through"
+                                : startTime === slot.start_time.slice(0, 5)
+                                  ? "border-violet-400/50 bg-violet-500/12 text-violet-100"
+                                  : "border-white/[0.09] bg-white/[0.025] hover:border-violet-400/30",
+                            )}
+                          >
+                            {slot.start_time.slice(0, 5)}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="mt-3 rounded-xl border border-dashed border-white/10 py-6 text-center text-sm text-subtle">No slots available on this date.</p>
+                  )}
                 </div>
-              ) : (
-                <p className="mt-3 rounded-xl border border-dashed border-white/10 py-6 text-center text-sm text-subtle">No slots available on this date.</p>
-              )}
-            </div>
-            {error && <p className="mt-4 rounded-xl border border-rose-400/25 bg-rose-500/10 p-3 text-xs text-rose-200">{error}</p>}
-          </DialogBody>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setRescheduleOpen(false)}>Cancel</Button>
-            <Button variant="cyan" loading={busy === "reschedule"} disabled={!startTime || Boolean(busy)} onClick={reschedule}>Confirm new time</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+                {error && <p className="mt-4 rounded-xl border border-rose-400/25 bg-rose-500/10 p-3 text-xs text-rose-200">{error}</p>}
+              </DialogBody>
+              <DialogFooter>
+                <Button variant="ghost" onClick={() => setRescheduleOpen(false)}>Cancel</Button>
+                <Button variant="cyan" loading={busy === "reschedule"} disabled={!startTime || Boolean(busy)} onClick={reschedule}>Confirm new time</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
 
-      <Dialog open={cancelOpen} onOpenChange={setCancelOpen}>
-        <DialogTrigger asChild>
-          <Button variant="destructive" size="sm"><XCircle className="size-3.5" /> Cancel booking</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Cancel this appointment?</DialogTitle>
-            <DialogDescription>This releases your slot and cancels your token. You can book a new appointment anytime.</DialogDescription>
-          </DialogHeader>
-          <DialogBody>
-            <Field label="Reason (optional)" hint="Helping us understand helps us improve.">
-              <Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. Plans changed" />
-            </Field>
-            {error && <p className="mt-4 rounded-xl border border-rose-400/25 bg-rose-500/10 p-3 text-xs text-rose-200">{error}</p>}
-          </DialogBody>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setCancelOpen(false)}>Keep appointment</Button>
-            <Button variant="destructive" loading={busy === "cancel"} disabled={Boolean(busy)} onClick={cancel}>Yes, cancel booking</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        {canCancel && (
+          <Dialog open={cancelOpen} onOpenChange={setCancelOpen}>
+            <DialogTrigger asChild>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => setError("")}
+              >
+                <XCircle className="size-3.5" /> Cancel booking
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Cancel this appointment?</DialogTitle>
+                <DialogDescription>This releases your slot and cancels your token. You can book a new appointment anytime.</DialogDescription>
+              </DialogHeader>
+              <DialogBody>
+                <Field label="Reason (optional)" hint="Helping us understand helps us improve.">
+                  <Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. Plans changed" />
+                </Field>
+                {error && <p className="mt-4 rounded-xl border border-rose-400/25 bg-rose-500/10 p-3 text-xs text-rose-200">{error}</p>}
+              </DialogBody>
+              <DialogFooter>
+                <Button variant="ghost" onClick={() => setCancelOpen(false)}>Keep appointment</Button>
+                <Button variant="destructive" loading={busy === "cancel"} disabled={Boolean(busy)} onClick={cancel}>Yes, cancel booking</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
+      </div>
+
+      {!canCancel && cancelMessage && (
+        <p className="flex items-start gap-2 rounded-xl border border-white/[0.07] bg-white/[0.02] p-3 text-xs leading-relaxed text-muted">
+          <Info className="mt-0.5 size-3.5 shrink-0 text-subtle" />
+          <span>{cancelMessage}</span>
+        </p>
+      )}
     </div>
   );
 }
